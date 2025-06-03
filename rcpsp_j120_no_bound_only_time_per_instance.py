@@ -10,7 +10,7 @@ This script:
 1. Finds all .data files in the data directory within the specified range
 2. Solves each RCPSP instance using the CP Optimizer with a fixed time limit per instance
 3. Does NOT use any provided optimal bounds (minimizes makespan freely)
-4. Records results in result/j120_no_bound_2.csv with columns:
+4. Records results in result/j120_no_bound_900s_2.csv with columns:
    - file name (just the filename, not the path)
    - Model constraint (makespan found)
    - Status (optimal/feasible/unknown)
@@ -22,6 +22,8 @@ import sys
 import csv
 import time
 from pathlib import Path
+from google.cloud import storage
+import os
 
 
 def solve_rcpsp(data_file):
@@ -123,7 +125,7 @@ def main():
     # Define directories
     data_dir = Path("data")
     result_dir = Path("result")
-    output_file = result_dir / "j120_no_bound_2.csv"
+    output_file = result_dir / "j120_no_bound_900s_2.csv"
 
     # Create result directory if it doesn't exist
     os.makedirs(result_dir, exist_ok=True)
@@ -226,6 +228,17 @@ def main():
 
     print(f"\nAll done! Results written to {output_file}")
 
+    # Tên bucket mà bạn đã tạo
+    bucket_name = "rcpsp-results-bucket"
+    client = storage.Client()
+    bucket = client.bucket(bucket_name)
+
+    local_path = "result/j120_no_bound_900s_2.csv"
+    blob_name = f"results/{os.path.basename(local_path)}"  # ví dụ "results/j30_no_bound_1200s.csv"
+
+    blob = bucket.blob(blob_name)
+    blob.upload_from_filename(local_path)
+    print(f"Uploaded {local_path} to gs://{bucket_name}/{blob_name}")
 
 if __name__ == "__main__":
     main()
