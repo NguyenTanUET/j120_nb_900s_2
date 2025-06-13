@@ -66,7 +66,7 @@ def solve_rcpsp_with_makespan_bound(data_file, target_makespan, time_remaining):
             LogVerbosity="Quiet"
         )
 
-        return res is not None
+        return res is not None and res.is_solution()
 
     except Exception as e:
         print(f"Error solving with makespan {target_makespan}: {str(e)}")
@@ -180,7 +180,7 @@ def main():
     # Define directories
     data_dir = Path("data")
     result_dir = Path("result")
-    output_file = result_dir / "j120_with_bound_900s.csv_2"
+    output_file = result_dir / "j120_with_bound_900s_2.csv"
 
     # Create result directory if it doesn't exist
     os.makedirs(result_dir, exist_ok=True)
